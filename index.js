@@ -50,31 +50,49 @@ function process(data) {
 }
 
 function processIter(data, parent) {
+    // for now
+    var angle = Math.PI/2, r = 100;
+    function getNextCoordinate(angle, r, parent) {
+        var rX = Math.cos(angle) * r;
+        var rY = Math.sin(angle) * r;
+        var x = getNumberStyle(parent, "left") - rX;
+        var y = getNumberStyle(parent, "top") - rY;
+        return [x, y];
+    }
     for(id in data) {
-	
+        var node = createNode(id);
+        var co = getNextCoordinate(angle, r, parent);
+        angle += 1/2;
+        setNumberStyle(node, "left", co[0]);
+        setNumberStyle(node, "top", co[1]);
+        node.innerHTML = data[id]['text'];
+        canvas.appendChild(node);
+        linkNodes(node, parent);
+        processIter(data['child'], node);
     }
 }
 
 function linkNodes(node, parent) {
-    
+    var svg = createLinkSvg(node, parent);
+    canvas.appendChild(svg);
 }
 
 function getNumberStyle(node, styleName) {
     if(isEmpty(styleName)) {
-	return null;
+        return null;
     }
     else {
-	var styleStr = node.style[styleName];
-	if(isEmpty(styleStr)) {
-	    setNumberStyle(node, styleName, 0);
-	    return 0;
-	}
-	var result = parseInt(styleStr);
-	if(isNaN(result)) {
-	    setNumberStyle(node, styleName, 0);
-	    return 0;
-	}
-	return result;
+        var styleStr = node.style[styleName];
+        if(isEmpty(styleStr)) {
+            setNumberStyle(node, styleName, 0);
+            return 0;
+        }
+        var result = parseInt(styleStr);
+        if(isNaN(result)) {
+            setNumberStyle(node, styleName, 0);
+            return 0;
+        }
+        return result;
     }
 }
 
@@ -84,18 +102,31 @@ function setNumberStyle(node, styleName, number) {
 
 function isEmpty(str) {
     if(str == null || str == "") {
-	return true;
+        return true;
     }
     else {
-	return false;
+        return false;
     }
 }
 
-function createSvg(id, width, height) {
+function createLinkSvg(node, parent) {
     var svg = document.createElement("svg");
-    svg.setAttribute("id", id);
-    svg.setAttribute("width", width);
-    svg.setAttribute("height", height);
+    svg.setAttribute("id", parent.id + '-' + node.id);
+    svg.zIndex = -1;
+    
+    // for now
+    var top = Math.min(getNumberStyle(parent, "top"), getNumberStyle(node, "top"));
+    var left = Math.min(getNumberStyle(parent, "left"), getNumberStyle(node, "left"));
+    var width = Math.abs(getNumberStyle(parent, "top") - getNumberStyle(node, "top"));
+    var height = Math.abs(getNumberStyle(parent, "top") - getNumberStyle(node, "top"));
+    
+    setNumberStyle(svg, "top", top);
+    setNumberStyle(svg, "left", left);
+    setNumberStyle(svg, "width", width);
+    setNumberStyle(svg, "height", height);
+    
+    var path = document.createElement("path");
+    // decide what kind of diagonals to draw and draw
     return svg;
 }
 

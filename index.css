@@ -25,3 +25,7 @@ div.canvas {
     left: 0;
     top: 0;
 }
+
+svg.link {
+    position: absolute;
+}
