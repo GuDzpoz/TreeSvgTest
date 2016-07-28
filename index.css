@@ -1,4 +1,4 @@
-<!--
+/*
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -11,15 +11,17 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
--->
-<html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <title>TEST</title>
-    <link rel="stylesheet" type="text/css" href="index.css" />
-    <script type="text/javascript" src="index.js"></script>
-  </head>
-  <body>
-    <div class="canvas" id="canvas"></div>
-  </body>
-</html>
+*/
+div.node {
+    border: 0.25rem solid #008b8b;
+    background-color: #00ffff;
+    text-align: center;
+    position: absolute;
+}
+
+div.canvas {
+    background-color: #f0f8ff;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
