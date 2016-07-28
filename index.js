@@ -15,14 +15,41 @@
 
 var data = {
     'id': {
-	'text': 'id is just is in HTML',
+	'text': 'id is just id in HTML',
 	'child': {
 	    'f0f8ff': {
 		'text': 'Test',
 	    },
 	    '00ffff': {
 		'text': 'DarkCyan',
-	    }
+		'child': {
+			'008080': {
+				'text': 'Is Cyan a child of Drak Cyan?',
+				'child': {
+					'f0f8ff': {
+						'text': 'My id is the same as Test\'s, but it does\'t matter for now.',
+					},
+					'ffffff': {
+						'text': 'White!',
+					},
+					'LittleInferno': {
+						'text': 'Like a bug in a mug in a hug!',
+						'child': {
+							'more': {
+								'text': 'Why not add some more?',
+							},
+							'info': {
+								'text': 'It\'s a test!', 
+							},
+						},
+					},
+					'Goo': {
+						'text': 'GOOOOOOOOOOOOOOOOOOOOOOOOOOO!',
+					},
+				},
+			},
+		},
+	    },
 	},
     },
 };
@@ -51,11 +78,11 @@ function process(data) {
 
 function processIter(data, parent) {
     // for now
-    var angle = Math.PI/2, r = 100;
+    var angle = -Math.PI/4, r = 100;
     function getNextCoordinate(angle, r, parent) {
         var rX = Math.cos(angle) * r;
         var rY = Math.sin(angle) * r;
-        var x = getNumberStyle(parent, "left") - rX;
+        var x = getNumberStyle(parent, "left") + rX;
         var y = getNumberStyle(parent, "top") - rY;
         return [x, y];
     }
@@ -68,7 +95,7 @@ function processIter(data, parent) {
         node.innerHTML = data[id]['text'];
         canvas.appendChild(node);
         linkNodes(node, parent);
-        processIter(data['child'], node);
+        processIter(data[id]['child'], node);
     }
 }
 
@@ -110,14 +137,15 @@ function isEmpty(str) {
 }
 
 function createLinkSvg(node, parent) {
-    var svg = document.createElement("svg");
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("id", parent.id + '-' + node.id);
+    svg.setAttribute("class", "link");
     svg.zIndex = -1;
     
     // for now
     var top = Math.min(getNumberStyle(parent, "top"), getNumberStyle(node, "top"));
     var left = Math.min(getNumberStyle(parent, "left"), getNumberStyle(node, "left"));
-    var width = Math.abs(getNumberStyle(parent, "top") - getNumberStyle(node, "top"));
+    var width = Math.abs(getNumberStyle(parent, "left") - getNumberStyle(node, "left"));
     var height = Math.abs(getNumberStyle(parent, "top") - getNumberStyle(node, "top"));
     
     setNumberStyle(svg, "top", top);
@@ -125,9 +153,30 @@ function createLinkSvg(node, parent) {
     setNumberStyle(svg, "width", width);
     setNumberStyle(svg, "height", height);
     
-    var path = document.createElement("path");
-    // decide what kind of diagonals to draw and draw
+    var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    if(anyTopRight(node, parent)) {
+    	path.setAttribute("d", "M" + width + " 0 L0 " + height);
+    }
+    else {
+    	path.setAttribute("d", "M0 0 L" + width + " " + height);
+    }
+    svg.appendChild(path);
     return svg;
+}
+
+function anyTopRight(node1, node2) {
+	if(
+			(getNumberStyle(node1, "top") > getNumberStyle(node2, "top") 
+			&& getNumberStyle(node1, "left") < getNumberStyle(node2, "left"))
+			||
+			(getNumberStyle(node1, "top") < getNumberStyle(node2, "top") 
+			&& getNumberStyle(node1, "left") > getNumberStyle(node2, "left"))
+	) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 function createNode(id) {

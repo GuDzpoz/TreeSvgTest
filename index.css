@@ -19,13 +19,26 @@ div.node {
     position: absolute;
 }
 
+div.node:hover {
+	z-index: 20;
+}
+
 div.canvas {
     background-color: #f0f8ff;
     position: fixed;
     left: 0;
     top: 0;
+    overflow: auto;
 }
 
 svg.link {
     position: absolute;
+    z-index: 10;
+}
+
+svg.link path {
+	position: absolute;
+	stroke: #808000;
+	stroke-width: 2;
+	opacity: 0.5;
 }
