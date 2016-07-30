@@ -1,6 +1,5 @@
-<!ELEMENT document (node*)>
-<!ATTLIST document title CDATA #REQUIRED>
-<!ELEMENT node (title, referrer, references, node*)>
+<!ELEMENT document (title, node*)>
+<!ELEMENT node (title, referrers, references, node*)>
 <!ATTLIST node id CDATA #REQUIRED>
 <!ATTLIST node file CDATA #IMPLIED>
 <!ELEMENT title (#PCDATA)>

@@ -22,7 +22,8 @@ svg#svg {
 }
 
 .node text {
-  font: 10px sans-serif;
+    font: 1.12em sans-serif;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .node--internal circle {
@@ -35,7 +36,7 @@ svg#svg {
 
 .link {
   fill: none;
-  stroke: #555;
+  stroke: #000;
   stroke-opacity: 0.4;
   stroke-width: 1.5px;
 }

@@ -13,6 +13,50 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-    var svg = d3.select("#svg");
+var svg = d3.select("#svg");
+var g = svg.append("g");
+var tree = d3.tree().size([500, 500]);
+var myData = {};
+var x = 0, y = 0;
 
-    d3.xml("test.xml", function(error, data) {alert(data);});
+var hammertime = new Hammer(document);
+hammertime.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+hammertime.on('pan', function(ev) {
+    g.attr("transform", "translate(" + (x + ev.deltaX) + "," + (y + ev.deltaY) + ")");
+    if(ev.isFinal) {
+	x += ev.deltaX;
+	y += ev.deltaY;
+    }
+});
+
+// moveOnMove(g.node(), svg.node());
+
+d3.xml("test.xml", function(error, data) {
+    if(error) throw error;
+
+    myData = xml2json(data);
+
+    var root = d3.hierarchy(myData);
+    tree(root);
+
+    var link = g.selectAll(".link")
+	.data(root.descendants().slice(1))
+	.enter().append("path")
+	.attr("class", "link")
+	.attr("d", function(d) {
+            return "M" + d.y + "," + d.x
+		+ "C" + (d.y + d.parent.y) / 2 + "," + d.x
+		+ " " + (d.y + d.parent.y) / 2 + "," + d.parent.x
+		+ " " + d.parent.y + "," + d.parent.x;
+	});
+
+    var node = g.selectAll(".node")
+	.data(root.descendants())
+	.enter().append("g")
+	.attr("class", function(d) { return "node" + (d.children ? " node--internal" : " node--leaf"); })
+	.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+    var text = node.append("text")
+	.text(function(d) { return d.data.title; });
+});
+
