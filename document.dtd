@@ -1,0 +1,11 @@
+<!ELEMENT document (node*)>
+<!ATTLIST document title CDATA #REQUIRED>
+<!ELEMENT node (title, referrer, references, node*)>
+<!ATTLIST node id CDATA #REQUIRED>
+<!ATTLIST node file CDATA #IMPLIED>
+<!ELEMENT title (#PCDATA)>
+<!ELEMENT referrers (path*)>
+<!ELEMENT references (path*)>
+<!ELEMENT see (path*)>
+<!ELEMENT seen (path*)>
+<!ELEMENT path (#PCDATA)>
