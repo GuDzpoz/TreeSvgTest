@@ -20,16 +20,14 @@ var myData = {};
 var x = 0, y = 0;
 
 var hammertime = new Hammer(document);
-hammertime.get('pan').set({ direction: Hammer.DIRECTION_ALL });
-hammertime.on('pan', function(ev) {
-    g.attr("transform", "translate(" + (x + ev.deltaX) + "," + (y + ev.deltaY) + ")");
-    if(ev.isFinal) {
-	x += ev.deltaX;
-	y += ev.deltaY;
+hammertime.get("pan").set({ direction: Hammer.DIRECTION_ALL });
+hammertime.on("pan", function(event) {
+    g.attr("transform", "translate(" + (x + event.deltaX) + "," + (y + event.deltaY) + ")");
+    if(event.isFinal) {
+	x += event.deltaX;
+	y += event.deltaY;
     }
 });
-
-// moveOnMove(g.node(), svg.node());
 
 d3.xml("test.xml", function(error, data) {
     if(error) throw error;
@@ -58,5 +56,14 @@ d3.xml("test.xml", function(error, data) {
 
     var text = node.append("text")
 	.text(function(d) { return d.data.title; });
+
+    g.selectAll(".node").each(function(d) {
+	var hammerer = new Hammer(this);
+	hammerer.on("tap", showToolBox);
+    });
 });
 
+function showToolBox(event) {
+    console.log(this);
+    console.log(event);
+}

@@ -1,17 +1,27 @@
-var momIsMouseDown = false;
-var momX, momY;
-var momStartX, momStartY;
 function moveOnMove(object, source) {
-    momX = 0;
-    momY = 0;
+    function addHandle(element, eventString, callback) {
+	if(element[eventString] == null) {
+	    element[eventString] = callback;
+	}
+	else {
+	    temp = element[eventString];
+	    element[eventString] = function() {
+		temp();
+		callback();
+	    }
+	}
+    }
+    var momIsMouseDown = false;
+    var momX = 0, momY = 0;
+    var momStartX, momStartY;
     
-    source.onmousedown = function(event) {
+    addHandle(source, "onmousedown", function(event) {
 	momIsMouseDown = true;
 	momStartX = event.clientX;
 	momStartY = event.clientY;
-    };
+    });
     
-    source.onmousemove = function(event) {
+    addHandle(source, "onmousemove", function(event) {
 	if((event.buttons && 1) != 0 && momIsMouseDown) {
 	    momX += event.clientX - momStartX;
 	    momStartX = event.clientX;
@@ -19,9 +29,9 @@ function moveOnMove(object, source) {
 	    momStartY = event.clientY;
 	    object.setAttribute("transform", "translate(" + momX + "," + momY + ")");
 	}
-    };
+    });
 
-    source.onmouseup = function(event) {
+    addHandle(source, "onmouseup", function(event) {
 	momIsMouseDown = false;
-    }
+    });
 }
