@@ -8,3 +8,4 @@
 <!ELEMENT see (path*)>
 <!ELEMENT seen (path*)>
 <!ELEMENT path (#PCDATA)>
+<!ATTLIST path id CDATA #IMPLIED>

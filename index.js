@@ -64,6 +64,25 @@ d3.xml("test.xml", function(error, data) {
 });
 
 function showToolBox(event) {
-    console.log(this);
-    console.log(event);
+    d = event.target.__data__.data;
+    var data = {
+	"Browse" : "<a href=\"" + d.file + "\">" + escapeHtml(d.file) + "</a>",
+    };
+    displayToolBox(d.x, d.y, g, d.title, data);
+}
+
+function displayToolBox(x, y, group, title, data) {
+    
+}
+
+function escapeHtml(text) {
+  var map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+
+  return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }
