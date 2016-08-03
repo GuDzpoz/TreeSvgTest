@@ -13,18 +13,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function xml2json(xmlDocument) {
+function xml2json(xml) {
     // Search for root element "document"
     var json = {};
-    for(childIndex in xmlDocument.children) {
-	if(xmlDocument.children[childIndex].nodeName == "document") {
-	    xmlIter(xmlDocument.children[childIndex], "", json);
+    for(childIndex in xml.children) {
+	if(xml.children[childIndex].nodeName == "document") {
+	    xmlIter(xml.children[childIndex], "", json);
 	}
     }
     return json;
 }
 
-function xmlIter(element, parentId, output) {
+function xmlIter(element, parent, output) {
     output.parentId = parentId;
     output.parentNodeId = parentId;
     output.id = getAttributeByName(element, "id");

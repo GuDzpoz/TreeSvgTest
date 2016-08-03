@@ -20,9 +20,25 @@
   </head>
   <body>
     <svg id="svg"></svg>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.1.1/d3.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
-    <script type="text/javascript" src="xml2json.js"></script>
-    <script type="text/javascript" src="index.js"></script>
+    <script type="text/javascript" data-main="js/main" src="js/lib/require.js"></script>
+    <script>
+      require.config({
+        baseUrl: "js/",
+        paths: {
+          "d3": "lib/d3",
+          "hammer": "lib/hammer",
+          "require": "lib/require",
+        },
+        shim: {
+          "d3": {
+            exports: "d3",
+          },
+          "hammer": {
+            exports: "Hammer",
+          },
+        },
+      });
+    </script>
+    <button id="button">ClickME!</button>
   </body>
 </html>
