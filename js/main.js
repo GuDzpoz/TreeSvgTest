@@ -13,9 +13,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define(["dtd", "data", "display", "d3", "hammer"], function(dtd, data, display, d3, hammer) {
+define(["dtd", "data", "display", "gesture", "d3"], function(dtd, data, display, gesture, d3) {
     data.load("test.xml", function(json) {
 	display.display(json, "#svg");
+	gesture.mapDragging(d3.select(document), display.getGroup());
     });
     
     return {};
