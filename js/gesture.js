@@ -13,7 +13,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define(["dtd", "display", "d3", "hammer"], function(dtd, display, d3, hammer) {
+define(["display", "d3", "hammer"], function(display, d3, hammer) {
     var mapDragging = function(d3Src, d3Dst, x = 0, y = 0) {
 	var hammertime = new hammer(d3Src.node());
 	d3Dst.each(function(d) {
@@ -37,7 +37,19 @@ define(["dtd", "display", "d3", "hammer"], function(dtd, display, d3, hammer) {
 	    }
 	});
     };
+    var onTap = function(d3Group, callback) {
+	d3Group.each(function(d) {
+	    var node = this;
+	    var hammertime = new hammer(node);
+	    hammertime.get("doubletap").set({ enable: false });
+	    hammertime.get("press").set({ enable: false });
+	    hammertime.get("pan").set({ enable: false });
+	    hammertime.get("swipe").set({ enable: false });
+	    hammertime.on("tap", function() { callback.call(node, d); });
+	});
+    };
     return {
 	mapDragging: mapDragging,
+	onTap: onTap,
     };
 });

@@ -13,35 +13,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define(["ajax", "d3"], function(ajax, d3) {
-    var json;
-    var load = function(path, callback) {
-	ajax.send(ajax.requests.GET_PATH, { "file": path }, function(error, xmlhttp) {
-	    if(error) {
-		ajax.simpleAlert(error, function() {
-		    window.history.go(-1);
-		});
-	    }
-	    ajax.json(xmlhttp.responseText, function(error, data) {
-		if(error) {
-		    ajax.simpleAlert(error, function() {
-			window.history.go(-1);
-		    });
-		}
-
-		json = data;
-		
-		callback(json);
+define(["data", "display", "gesture", "d3"], function(data, display, gesture, d3) {
+    data.load(window.location.search.substring(1), function(json) {
+	display.display(json, "#svg");
+	gesture.mapDragging(d3.select(document), display.getGroup());
+	gesture.onTap(d3.selectAll(".node"), function(data) {
+	    display.showOptionBox.call(this, data);
+	    gesture.onTap(d3.select("#blocker"), function(data) {
+		display.hideOptionBox.call(this);
 	    });
 	});
-	return json;
-    };
-    var get = function() {
-	return json;
-    };
-
-    return {
-	load: load,
-	get: get,
-    };
+    });
+    
+    return {};
 });

@@ -13,35 +13,26 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define(["ajax", "d3"], function(ajax, d3) {
-    var json;
-    var load = function(path, callback) {
-	ajax.send(ajax.requests.GET_PATH, { "file": path }, function(error, xmlhttp) {
-	    if(error) {
-		ajax.simpleAlert(error, function() {
-		    window.history.go(-1);
-		});
-	    }
-	    ajax.json(xmlhttp.responseText, function(error, data) {
-		if(error) {
-		    ajax.simpleAlert(error, function() {
-			window.history.go(-1);
-		    });
+define(["ajax"], function(ajax) {
+    var getPath = function(d) {
+	return function() {
+	    function pathIter(d) {
+		if(d.parent == null) {
+		    return "/" + d.data.title;
 		}
-
-		json = data;
-		
-		callback(json);
-	    });
-	});
-	return json;
+		else {
+		    return pathIter(d.parent) + "/" + d.data.id;
+		}
+	    }
+	    alert(pathIter(d));
+	};
     };
-    var get = function() {
-	return json;
+    var options = function() {
+	return {
+	    "Get The Path Of The Node": getPath,
+	};
     };
-
     return {
-	load: load,
-	get: get,
+	options: options,
     };
 });

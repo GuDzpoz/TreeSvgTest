@@ -13,11 +13,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define(["dtd", "data", "d3"], function(dtd, data, d3) {
+define(["data", "operate", "d3"], function(data, operate, d3) {
     var g;
     var svg;
     var width, height;
     var root;
+    var blocker, optionBox, clicked;
     var transform = function(d3Element, identity, data) {
 	var d = d3Element.data();
 	if(d.transform == null) {
@@ -76,12 +77,60 @@ define(["dtd", "data", "d3"], function(dtd, data, d3) {
 	    .append("text")
 	    .text(function(d) { return d.data.title; });
     };
+    var processOptions = function(options, data) {
+	var elements = [];
+	for(name in options) {
+	    var a = document.createElement("a");
+	    var gesture = require("gesture");
+	    gesture.onTap(d3.select(a), options[name](data));
+	    a.innerHTML = name;
+	    elements.push(a);
+	}
+	return elements;
+    };
+    var setOptionBox = function(optionBox, data) {
+	optionBox.selectAll("ul").remove();
+	optionBox.append("ul").selectAll("li")
+	    .data(processOptions(operate.options(), data))
+	    .enter().append("li")
+	    .each(function(d) {
+		var d3Element = d3.select(this);
+		d3Element.append(function() { return d; });
+	    });
+	optionBox.style("display", "inline");
+    };
+    var showOptionBox = function(d) {
+	if(blocker) {
+	    blocker.style("display", "inline");
+	}
+	else {
+	    blocker = d3.select("body").append("div")
+		.attr("id", "blocker");
+	}
+
+	if(optionBox) {
+	}
+	else {
+	    optionBox = d3.select("body").append("div")
+		.attr("id", "option")
+		.style("display", "none");
+	}
+	setOptionBox(optionBox, d);
+	clicked = d3.select(this).attr("id", "clicked");
+    };
+    var hideOptionBox = function() {
+	optionBox.style("display", "none");
+	blocker.style("display", "none");
+	clicked.attr("id", "");
+    };
     var getGroup = function() {
 	return g;
     };
     return {
 	display: display,
 	transform: transform,
+	showOptionBox: showOptionBox,
+	hideOptionBox: hideOptionBox,
 	getGroup: getGroup,
     };
 });

@@ -1,3 +1,4 @@
+<?php
 /*
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -13,35 +14,31 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define(["ajax", "d3"], function(ajax, d3) {
-    var json;
-    var load = function(path, callback) {
-	ajax.send(ajax.requests.GET_PATH, { "file": path }, function(error, xmlhttp) {
-	    if(error) {
-		ajax.simpleAlert(error, function() {
-		    window.history.go(-1);
-		});
-	    }
-	    ajax.json(xmlhttp.responseText, function(error, data) {
-		if(error) {
-		    ajax.simpleAlert(error, function() {
-			window.history.go(-1);
-		    });
-		}
+require_once("config.php");
+require_once("util.php");
 
-		json = data;
-		
-		callback(json);
-	    });
-	});
-	return json;
-    };
-    var get = function() {
-	return json;
-    };
+$request = $_GET[TYPE_NAME];
+if(empty($request)) {
+    HTTPResponse(400);
+    exit(1);
+}
+else {
+    $request = strtoupper($request);
+}
+switch($request) {
+case "LIST":
+    if(!readfile(LIST_PATH)) { echoError(); exit(1); }
+    break;
+case "GET_PATH":
+    echo DATA_DIRECTORY . $_GET["file"];
+    break;
+default:
+    HTTPResponse(400);
+    exit(1);
+}
 
-    return {
-	load: load,
-	get: get,
-    };
-});
+function echoError($prependString = "") {
+    $info = error_get_last();
+    echo $prependString . PHP_EOL;
+    print_r($info);
+}

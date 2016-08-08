@@ -15,29 +15,21 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <title>Select File</title>
-    <link rel="stylesheet" type="text/css" href="index.css" />
+    <title>Login</title>
   </head>
   <body>
-    <div id="loading">Loading...</div>
-    <script type="text/javascript" data-main="js/index" src="js/lib/require.js"></script>
-    <script>
-      require.config({
-        baseUrl: "js/",
-        paths: {
-          "d3": "lib/d3",
-          "hammer": "lib/hammer",
-          "require": "lib/require",
-        },
-        shim: {
-          "d3": {
-            exports: "d3",
-          },
-          "hammer": {
-            exports: "Hammer",
-          },
-        },
-      });
-    </script>
+    <form action="php/login.php" method="post">
+      <table>
+	<tr>
+	  <td><label for="name">User Name</label></td>
+	  <td><input type="text" id="name" name="name" /></td>
+	</tr>
+	<tr>
+	  <td><label for="password">Password</label></td>
+	  <td><input type="password" id="password" name="password" /></td>
+	</tr>
+      </table>
+      <input type="submit" />
+    </form>
   </body>
 </html>

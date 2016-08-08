@@ -1,42 +1,23 @@
-/*
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-svg#svg {
+html {
+    font-family: "Fira Sans", "Source Sans Pro", Helvetica, Arial, sans-serif;
+    color: #000000;
+    background-color: #ffffff;
+    margin-left: 10%;
+    margin-right: 10%;
+}
+body {
+    background-color: #f0f8ff;
+    padding: 2%;
+}
+h3 {
+    text-align: center;
+}
+table.list {
     width: 100%;
-    height: 100%;
+    text-align: center;
 }
-
-.node circle {
-  fill: #999;
+table.list tr:nth-child(odd) {
+    background-color: #ffffff;
 }
-
-.node text {
-    font: 1.12em sans-serif;
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-.node--internal circle {
-  fill: #555;
-}
-
-.node--internal text {
-  text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
-}
-
-.link {
-  fill: none;
-  stroke: #000;
-  stroke-opacity: 0.4;
-  stroke-width: 1.5px;
+table.list tr:nth-child(even) {
 }
