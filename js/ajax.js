@@ -74,6 +74,10 @@ define(function() {
     var post = {
 	CREATE_REPOSITORY: "CREATE_REPOSITORY",
 	DELETE_REPOSITORY: "DELETE_REPOSITORY",
+	CREATE_NODE: "CREATE_SUBNODE",
+	DETELE_NODE: "DETELE_NODE",
+	UPDATE_NODE: "UPDATE_NODE",
+	UPDATE_NODE_CONTENT: "UPDATE_NODE_CONTENT",
     };
     var requests = Object.assign({}, get, post);
     var send = function(request, data, callback) {

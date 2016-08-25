@@ -14,22 +14,35 @@
 */
 
 define(["ajax"], function(ajax) {
-    var getPath = function(d) {
-	return function() {
-	    function pathIter(d) {
-		if(d.parent == null) {
-		    return "/" + d.data.title;
-		}
-		else {
-		    return pathIter(d.parent) + "/" + d.data.id;
-		}
+    var getPath = function(data) {
+	function pathIter(d) {
+	    if(d.parent == null) {
+		return "/";
 	    }
-	    alert(pathIter(d));
-	};
+	    else {
+		return pathIter(d.parent) + "/" + d.data.id;
+	    }
+	}
+	return pathIter(data);
     };
-    var options = function() {
+    var getRoot = function(data) {
+	var d = data;
+	while(d.parent != null) {
+	    d = d.parent;
+	}
+	return d;
+    };
+    var getView = function(data) {
+	return "view.html?" + "repo=" + getRoot(data).data.file + "&file=" + data.data.file;
+    };
+    var options = function(data) {
 	return {
-	    "Get The Path Of The Node": getPath,
+	    "Get The Path Of The Node": {
+		text: getPath(data),
+	    },
+	    "View The Content Of The Node": {
+		link: getView(data),
+	    },
 	};
     };
     return {

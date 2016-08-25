@@ -13,14 +13,20 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define(["data", "operate", "d3"], function(data, operate, d3) {
+define(["options", "gesture", "d3"], function(options, gesture, d3) {
     var g;
     var svg;
     var width, height;
     var root;
     var blocker, optionBox, clicked;
     var transform = function(d3Element, identity, data) {
-	var d = d3Element.data();
+	d3Element.each(function(d) {
+	    if(d) {
+	    } else {
+		d3.select(this).data([{}]);
+	    }
+	});
+	var d = d3Element.datum();
 	if(d.transform == null) {
 	    d.transform = {};
 	}
@@ -77,12 +83,20 @@ define(["data", "operate", "d3"], function(data, operate, d3) {
 	    .append("text")
 	    .text(function(d) { return d.data.title; });
     };
-    var processOptions = function(options, data) {
+    var processOptions = function(options) {
 	var elements = [];
 	for(name in options) {
 	    var a = document.createElement("a");
-	    var gesture = require("gesture");
-	    gesture.onTap(d3.select(a), options[name](data));
+	    var response = options[name];
+	    if(response.text) {
+		var text = response.text;
+		gesture.onTap(d3.select(a), function() {
+		    alert(text);
+		});
+	    }
+	    if(response.link) {
+		a.setAttribute("href", response.link);
+	    }
 	    a.innerHTML = name;
 	    elements.push(a);
 	}
@@ -91,7 +105,7 @@ define(["data", "operate", "d3"], function(data, operate, d3) {
     var setOptionBox = function(optionBox, data) {
 	optionBox.selectAll("ul").remove();
 	optionBox.append("ul").selectAll("li")
-	    .data(processOptions(operate.options(), data))
+	    .data(processOptions(options.options(data)))
 	    .enter().append("li")
 	    .each(function(d) {
 		var d3Element = d3.select(this);

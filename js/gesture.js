@@ -13,31 +13,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define(["display", "d3", "hammer"], function(display, d3, hammer) {
-    var mapDragging = function(d3Src, d3Dst, x = 0, y = 0) {
-	var hammertime = new hammer(d3Src.node());
-	d3Dst.each(function(d) {
-	    var data = d ? d : {};
-	    data.mapDragging = [x, y];
-	    display.transform(d3Dst, "translate", data.mapDragging)
-	    hammertime.get("pan").set({ direction: hammer.DIRECTION_ALL });
-	    hammertime.on("pan", function(event) {
-		var coordinate = data.mapDragging;
-		var translate = [coordinate[0] + event.deltaX, coordinate[1] + event.deltaY];
-		display.transform(d3Dst, "translate", translate);
-		if(event.isFinal) {
-		    data.mapDragging = translate;
-		}
-	    });
-
-	    if(d) {
-	    }
-	    else {
-		return data;
-	    }
-	});
-    };
-    var onTap = function(d3Group, callback) {
+define(["d3", "hammer"], function(d3, hammer) {
+    var on = function(event, d3Group, callback, options) {
 	d3Group.each(function(d) {
 	    var node = this;
 	    var hammertime = new hammer(node);
@@ -45,11 +22,22 @@ define(["display", "d3", "hammer"], function(display, d3, hammer) {
 	    hammertime.get("press").set({ enable: false });
 	    hammertime.get("pan").set({ enable: false });
 	    hammertime.get("swipe").set({ enable: false });
-	    hammertime.on("tap", function() { callback.call(node, d); });
+	    hammertime.get("tap").set({ enable: false });
+	    hammertime.on(event, function(event) { callback.call(node, event, d); });
+	    hammertime.get(event).set({ enable: true });
+	    if(options) {
+		hammertime.get(event).set(options);
+	    }
 	});
     };
+    var onDrag = function(d3Group, callback) {
+	on("pan", d3Group, callback, { direction: hammer.DIRECTION_ALL });
+    };
+    var onTap = function(d3Group, callback) {
+	on("tap", d3Group, callback);
+    };
     return {
-	mapDragging: mapDragging,
+	onDrag: onDrag,
 	onTap: onTap,
     };
 });
