@@ -48,6 +48,11 @@ define(["options", "gesture", "d3"], function(options, gesture, d3) {
 	}
     }
     var display = function(json, svgSelector) {
+        if(options.save) {
+            d3.select("body").append("button").text("Save").on("click", function() {
+                options.save();
+            });
+        }
 	svg = d3.select(svgSelector);
 	
 	root = d3.hierarchy(json);
