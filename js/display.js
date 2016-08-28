@@ -94,6 +94,11 @@ define(["options", "gesture", "d3"], function(options, gesture, d3) {
 		    alert(text);
 		});
 	    }
+            if(response.callback) {
+		gesture.onTap(d3.select(a), function() {
+		    response.callback();
+		});
+            }
 	    if(response.link) {
 		a.setAttribute("href", response.link);
 	    }

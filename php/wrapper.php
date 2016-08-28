@@ -44,13 +44,18 @@ $editRepository = function() {
         if(preg_match('/^[\s]*$/', $command)) {
             continue;
         }
-        $words = preg_split("/[\s]+/", $command);
+        $words = preg_split("/[\s]+/", $command, 3);
         switch($words[0]) {
         case "NEW_NODE":
             $repository->newChildNode($words[1], $words[2]);
             break;
         case "REMOVE_NODE":
             $repository->removeNode($words[1]);
+            break;
+        case "MOVE_NODE":
+            $word2 = preg_split("/[\s]+/", $words[2]);
+            $repository->moveNode($words[1], $word2[0]);
+            break;
         }
     }
     $repository->save();

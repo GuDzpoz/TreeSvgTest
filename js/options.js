@@ -14,6 +14,8 @@
 */
 
 define(["ajax"], function(ajax) {
+    var commands = [];
+    var title = null;
     var getPath = function(data) {
 	function pathIter(d) {
 	    if(d.parent == null) {
@@ -32,11 +34,26 @@ define(["ajax"], function(ajax) {
 	}
 	return d;
     };
+    var getEdit = function(data) {
+	return "edit.html?" + "repo=" + encodeURIComponent(getRoot(data).data.title) + "&file=" + encodeURIComponent(data.data.file);
+    };
     var getView = function(data) {
-	return "view.html?" + "repo=" + encodeURIComponent(getRoot(data).data.file) + "&file=" + encodeURIComponent(data.data.file);
+	return "view.html?" + "repo=" + encodeURIComponent(getRoot(data).data.title) + "&file=" + encodeURIComponent(data.data.file);
+    };
+    var newChildNode = function(data) {
+        var path = getPath(data);
+        var repoTitle = getRoot(data).data.title;
+        return function() {
+            var title = prompt("Please enter the title of The new node:");
+            if(title == null || title == "") {
+                alert("The title must not be empty!");
+                return;
+            }
+            commands.push("NEW_NODE " + path + " " + title);
+        };
     };
     var options = function(data) {
-	return {
+	var options = {
 	    "Get The Path Of The Node": {
 		text: getPath(data),
 	    },
@@ -44,8 +61,38 @@ define(["ajax"], function(ajax) {
 		link: getView(data),
 	    },
 	};
+        if(ajax.isLoginned()) {
+            Object.assign(options, {
+                "Edit Node Content": {
+                    link: getEdit(data),
+                },
+                "New Child Node": {
+                    callback: newChildNode(data),
+                }, /* not yet
+                "Move Node": {
+                    callback: moveNode(data),
+                },
+                "Remove Node": {
+                    callback: removeNode(data),
+                }, */
+            });
+        }
+        return options;
     };
+    var save = function(callback) {
+        if(title == null) {
+            alert("Nothing to save.");
+            return;
+        }
+        ajax.send(ajax.requests.EDIT_REPOSITORY, { "title": title, "command": commands.join("\n") }, callback);
+    };
+    if(ajax.isLoginned()) {
+        return {
+	    options: options,
+            save: save,
+        };
+    }
     return {
-	options: options,
+        options: options,
     };
 });
