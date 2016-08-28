@@ -13,27 +13,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define(["ajax", "d3"], function(ajax, d3) {
+define(["ajax"], function(ajax) {
     var json;
-    var load = function(path, callback) {
-	ajax.send(ajax.requests.GET_PATH, { "file": path }, function(error, xmlhttp) {
+    var load = function(title, callback) {
+	ajax.send(ajax.requests.GET_REPOSITORY, { "title": title }, function(error, xmlhttp) {
 	    if(error) {
-		ajax.simpleAlert(error, function() {
+		ajax.simpleAlert(xmlhttp, function() {
 		    window.history.go(-1);
 		});
 	    }
-	    ajax.json(xmlhttp.responseText, function(error, data) {
-		if(error) {
-		    ajax.simpleAlert(error, function() {
-			window.history.go(-1);
-		    });
-		}
+            // no idea why
+	    json = eval("(" + xmlhttp.responseText + ")");
 
-		json = data;
-		
-		callback(json);
-	    });
+            callback(json);
 	});
+        // undefined because of asynchrony
 	return json;
     };
     var get = function() {

@@ -18,7 +18,7 @@ require_once("config.php");
 
 function auth() {
     session_start();
-    if(empty($_SESSION[SESSION_VAR])) {
+    if(empty($_SESSION[constant("SESSION_VAR")])) {
         session_destroy();
         return false;
     }
@@ -33,9 +33,9 @@ function login($name, $password) {
         "MyRepository" => "9627a53f19a6f0f82b160aa77a5e5f619fce0e04d88c8ea51f7093cf1d717eb5bcaaef4eb6e14e074878a202d90d64e1683254ab26ffd2c9774f6843b7201639",
     );
     
-    if($info[$name] == hash(HASH_FUNCTION, $password)) {
+    if($info[$name] == securityHash($password)) {
         session_start();
-        $_SESSION[SESSION_VAR] = hash(HASH_FUNCTION, $name);
+        $_SESSION[constant("SESSION_VAR")] = securityHash($name);
         return true;
     }
     else {
@@ -51,4 +51,8 @@ function logout() {
         $params["secure"], $params["httponly"]
     );
     session_destroy();
+}
+
+function securityHash($string) {
+    return hash(constant("SECURITY_HASH"), $string);
 }

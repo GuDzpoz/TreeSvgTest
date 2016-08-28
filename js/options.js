@@ -33,7 +33,7 @@ define(["ajax"], function(ajax) {
 	return d;
     };
     var getView = function(data) {
-	return "view.html?" + "repo=" + getRoot(data).data.file + "&file=" + data.data.file;
+	return "view.html?" + "repo=" + encodeURIComponent(getRoot(data).data.file) + "&file=" + encodeURIComponent(data.data.file);
     };
     var options = function(data) {
 	return {

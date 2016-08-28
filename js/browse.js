@@ -14,7 +14,7 @@
 */
 
 define(["data", "display", "gesture", "utilization", "d3"], function(data, display, gesture, utilization, d3) {
-    data.load(window.location.search.substring(1), function(json) {
+    data.load(decodeURIComponent(window.location.search.substring(1)), function(json) {
 	display.display(json, "#svg");
 	utilization.mapDragging(d3.select(document), display.getGroup());
 	gesture.onTap(d3.selectAll(".node"), function(event, data) {

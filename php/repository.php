@@ -19,7 +19,7 @@ require_once ("util.php");
 define("LIST_NAME", "list");
 define("LIST_PATH", joinPaths(constant("DATA_DIRECTORY"), constant("LIST_NAME")));
 define("NODE_SEPARATOR", "/");
-function getPath($path, $isDir) {
+function getPath($path, $isDir = false) {
 	return joinPaths(constant("DATA_DIRECTORY"), $path, $isDir);
 }
 function hashForName($string) {
@@ -27,11 +27,8 @@ function hashForName($string) {
 }
 class RepositoryList {
 	public static function getInJson() {
-		if (file_exists ( constant ( "LIST_PATH" ) )) {
-			$content = file_get_contents ( constant ( "LIST_PATH" ) );
-			if ($content === false) {
-				error_process ( "" );
-			}
+		if(file_exists(constant("LIST_PATH"))) {
+			$content = file_get_contents(constant("LIST_PATH"));
 			return $content;
 		} else {
 			self::set ( array () );
@@ -39,10 +36,10 @@ class RepositoryList {
 		}
 	}
 	public static function get() {
-		$listJson = self::getInJson ();
-		$list = json_decode ();
-		if ($list == null) {
-			error_process ( "" );
+		$listJson = self::getInJson();
+		$list = json_decode($listJson);
+		if($list === null) {
+			error_process("");
 		}
 		return $list;
 	}
@@ -53,24 +50,42 @@ class RepositoryList {
 		}
 		return true;
 	}
-	public static function createRepository($title) {
-		if (repositoryExists ( $title )) {
+	public static function repositoryExists($title) {
+		$list = self::get();
+		$result = getItemFromBy($list, "title", $title);
+		if ($result === null) {
 			return false;
 		}
+		return true;
+	}
+    public static function getRepository($title) {
+        $list = self::get();
+        $repository = getItemFromBy($list, "title", $title);
+        if($repository === null) {
+            errorProcess(400, "Repository of title '$title' not exists.");
+        }
+        return $repository;
+    }
+	public static function createRepository($title) {
+		if(self::repositoryExists($title)) {
+            HTTPResponse(400);
+            echo "Repository Already Exists.";
+            exit(1);
+		}
 		
-		$list = self::get ();
-		$newItem = self::newRepository ( $title );
-		array_push ( $list, $newRepository );
-		self::set ( $list );
+		$list = self::get();
+		$newItem = self::newRepository($title);
+		array_push($list, $newItem);
+		self::set($list);
 		
-		$repository = initRepository ( $newItem );
+		$repository = self::initRepository($newItem);
 		mkdir ( getPath ( $repository->dir ) );
-		file_put_contents ( getPath ( $repository->file ), json_encode ( $repository ) );
+		file_put_contents(getPath($repository->file), json_encode($repository));
 		return true;
 	}
 	public static function deleteRepository($title) {
 		$list = self::get ();
-		getItemFromBy ( $list, "title", $title, function ($item, &$array, $i) {
+		getItemFromBy($list, "title", $title, function ($item, &$array, $i) {
 			unlink ( getPath ( $item->file ) );
 			delTree ( getPath ( $item->dir ) );
 			unset ( $array [$i] );
@@ -78,12 +93,11 @@ class RepositoryList {
 		RepositoryList::set ( $list );
 	}
 	private static function newRepository($title) {
-		$listItem = new stdClass ();
-		$name = hashForName ( $title );
-		$path = $name;
+		$listItem = new stdClass();
+		$path = hashForName($title);
 		$listItem->title = $title;
 		$listItem->file = $path;
-		$listItem->dir = $path . constant ( "REPOSITORY_APPEND" );
+		$listItem->dir = $path . constant("REPOSITORY_APPEND");
 		return $listItem;
 	}
 	private static function initRepository($repository) {
@@ -94,40 +108,29 @@ class RepositoryList {
 		$root->children = array ();
 		return $root;
 	}
-	private static function repositoryExists($title) {
-		$list = self::get ();
-		$result = getItemFromBy ( $list, "title", $title );
-		if ($result === null) {
-			return false;
-		}
-		return true;
-	}
 }
 class Repository {
 	private $repository;
     public static function getInJson($title) {
-        $list = RepositoryList::get();
-        $repository = getItemFromBy($list, "title", $title);
-        $content = file_get_contents($repository->file);
-		if ($content === false) {
-			error_process ( "" );
-		}
+        $repository = RepositoryList::getRepository($title);
+        $content = file_get_contents(getPath($repository->file));
         return $content;
     }
     public static function getArticle($title, $file) {
-        $list = RepositoryList::get();
-        $repository = getItemFromBy($list, "title", $title);
+        $repository = RepositoryList::getRepository($title);
         $path = joinPaths(getPath($repository->dir), $file);
         $content = file_get_contents($path);
         if ($content === false) {
-			error_process ( "" );
+			errorProcess (400, "File '$file' may not exist.");
 		}
         return $content;
     }
     public static function putArticle($title, $file, $content) {
-        $list = RepositoryList::get();
-        $repository = getItemFromBy($list, "title", $title);
+        $repository = RepositoryList::getRepository($title);
         $path = joinPaths(getPath($repository->dir), $file);
+        if ($content === false) {
+			errorProcess (400, "File '$file' may not exist.");
+		}
         return file_put_contents($path, $content);
     }
 	public function __construct($title) {

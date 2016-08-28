@@ -68,16 +68,15 @@ define(function() {
 	511: "511 Network Authentication Required",
     };
     var get = {
-	LIST: "LIST",
-	GET_PATH: "GET_PATH",
+	"GET_LIST": "GET_LIST",
+	"GET_REPOSITORY": "GET_REPOSITORY",
+	"GET_ARTICLE": "GET_ARTICLE",
     };
     var post = {
-	CREATE_REPOSITORY: "CREATE_REPOSITORY",
-	DELETE_REPOSITORY: "DELETE_REPOSITORY",
-	CREATE_NODE: "CREATE_SUBNODE",
-	DETELE_NODE: "DETELE_NODE",
-	UPDATE_NODE: "UPDATE_NODE",
-	UPDATE_NODE_CONTENT: "UPDATE_NODE_CONTENT",
+	"CREATE_REPOSITORY": "CREATE_REPOSITORY",
+	"DELETE_REPOSITORY": "DELETE_REPOSITORY",
+	"EDIT_REPOSTORY": "EDIT_REPOSTORY",
+	"EDIT_ARTICLE": "EDIT_ARTICLE",
     };
     var requests = Object.assign({}, get, post);
     var send = function(request, data, callback) {
@@ -88,48 +87,31 @@ define(function() {
 		    callback(null, xmlhttp);
 		}
 		else {
-		    callback(codes[xmlhttp.status], xmlhttp);
+		    callback(true, xmlhttp);
 		}
 	    }
 	};
-	if(request in get) {
-	    var argString = "";
-	    for(key in data) {
-		argString += "&" + key + "=" + data[key];
+	if(request in post) {
+	    if(!isLoginned()) {
+		return false;
 	    }
-	    xmlhttp.open("GET", "php/get.php?type=" + request + argString, true);
-	    xmlhttp.send();
 	}
-	else if(request in post) {
-	    var formData = new FormData();
-	    for(key in data) {
-		formData.append(key, data[key]);
-	    }
-	    formData.append("type", request);
-	    xmlhttp.open("POST", "php/post.php", true);
-	    xmlhttp.send(formData);
+	var formData = new FormData();
+	for(key in data) {
+	    formData.append(key, data[key]);
 	}
-    };
-    var json = function(url, callback) {
-	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.onreadystatechange = function() {
-	    if(xmlhttp.readyState == 4) {
-		console.log(xmlhttp);
-		if(xmlhttp.status == 200) {
-		    callback(null, xmlhttp.response);
-		}
-		else {
-		    callback(codes[xmlhttp.status], xmlhttp.response);
-		}
-	    }
-	};
-	xmlhttp.responseType = "json";
-	xmlhttp.open("GET", url, true);
-	xmlhttp.send();
+	formData.append("type", request);
+	xmlhttp.open("POST", "php/api.php", true);
+	xmlhttp.send(formData);
     };
     var simpleAlert = function(error, callback) {
 	console.log(error);
-	alert(error);
+        if(typeof error === 'string' || error instanceof String) {
+            alert(error);
+        }
+        else {
+	    alert(codes[error.status] + ": " + error.responseText);
+        }
 	if(callback) {
 	    callback();
 	}
@@ -137,12 +119,23 @@ define(function() {
 	    window.location.reload();
 	}
     };
+    // loginned or loggedIn?
+    var isLoginned = function() {
+	if(document.cookie.match("PHPSESSID")) {
+	    return true;
+	}
+	else {
+	    return false;
+	}
+    };
     
     return {
+	get: get,
+	post: post,
 	codes: codes,
 	requests: requests,
 	send: send,
-	json: json,
+	isLoginned: isLoginned,
 	simpleAlert: simpleAlert,
     };
 });

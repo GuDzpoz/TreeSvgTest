@@ -82,8 +82,8 @@ function HTTPResponse($code) {
  */
 function joinPaths() {
 	$isFirst = true;
-	function iter($paths) {
-		global $isFirst;
+	$iter = function($paths) {
+		global $isFirst, $iter;
 		if (is_string ( $paths )) {
 			if ($isFirst) {
 				$isFirst = false;
@@ -92,36 +92,37 @@ function joinPaths() {
 			return trim ( $paths, DIRECTORY_SEPARATOR );
 		}
 		if (is_array ( $paths )) {
-			return join ( DIRECTORY_SEPARATOR, array_map ( "iter", $paths ) );
+			return join ( DIRECTORY_SEPARATOR, array_map ( $iter, $paths ) );
 		}
-		error_process ( "" );
+		errorProcess(500, "Invalid argument in function 'joinPath' in 'util.php'.");
 	}
 	;
 	$args = func_get_args ();
-	if (empty ( $args )) {
+	if(empty($args)) {
 		return "";
 	}
-	$last = $args [count ( $args ) - 1];
-	if (is_string ( $last ) || is_array ( $last )) {
-		return iter ( $args );
+	$last = $args[count($args) - 1];
+	if(is_string($last) || is_array($last)) {
+		return $iter($args);
 	}
-	if ($last === true) {
-		array_pop ( $args );
-		return iter ( $args ) . DIRECTORY_SEPARATOR;
+	if($last === true) {
+		array_pop($args);
+		return $iter($args) . DIRECTORY_SEPARATOR;
 	}
-	array_shift ( $args );
-	return iter ( $args );
+	array_pop($args);
+	return $iter($args);
 }
-function error_process($message) {
-	HTTPResponse ( 500 );
-	echo $message;
-	echo var_export ( error_get_last (), true );
-	exit ( 1 );
+function errorProcess($code, $message) {
+	HTTPResponse($code);
+	$output = $message . PHP_EOL . var_export(error_get_last(), true);
+    error_log($output);
+    echo $output;
+	exit(1);
 }
-function getItemFromBy(&$array, $attrName, $attrValue, $callback) {
-	foreach ( $array as $index => $item ) {
-		if ($item->$attrName == $attrValue) {
-			if ($callback) {
+function getItemFromBy(&$array, $attrName, $attrValue, $callback = null) {
+	foreach($array as $index => $item) {
+		if($item->$attrName == $attrValue) {
+			if($callback) {
 				return $callback ( $item, $array, $index );
 			}
 			return $item;

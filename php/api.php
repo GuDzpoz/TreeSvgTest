@@ -18,6 +18,7 @@ require_once("config.php");
 require_once("util.php");
 require_once("repository.php");
 require_once("auth.php");
+require_once("wrapper.php");
 
 define("TYPE_NAME", "type");
 
@@ -32,17 +33,17 @@ else {
 
 // REQUEST_NAME => [process_function, isAuthNeeded]
 $requests = array(
-    "GET_LIST" => array($getList, 0),
-    "GET_REPOSITORY" => array($getRepository, 0),
-    "GET_ARTICLE" => array($getArticle, 0),
-    "CREATE_REPOSITORY" => array($createRepository, 1),
-    "DELETE_REPOSITORY" => array($deleteRepostory, 1),
+    "GET_LIST" => array($getList, false),
+    "GET_REPOSITORY" => array($getRepository, false),
+    "GET_ARTICLE" => array($getArticle, false),
+    "CREATE_REPOSITORY" => array($createRepository, true),
+    "DELETE_REPOSITORY" => array($deleteRepostory, true),
     /* "RENAME_REPOSITORY" => ..., not implemented */
-    "EDIT_REPOSTORY" => array($editRepository, 1), // to add, move and remove nodes, but edit(rename) nodes not implemented
-    "EDIT_ARTICLE" => array($editArticle, 1),
+    "EDIT_REPOSTORY" => array($editRepository, true), // to add, move and remove nodes, but edit(rename) nodes not implemented
+    "EDIT_ARTICLE" => array($editArticle, true),
 );
 
-if(array_key_exists($request, $requests) {
+if(array_key_exists($request, $requests)) {
     $callback = $requests[$request];
     if($callback[1]) {
         if(!auth()) {
@@ -56,104 +57,3 @@ else {
     HTTPResponse(400);
     exit(1);
 }
-
-function edit($repositoryTitle, $commands) {
-    $mapper = array(
-        "ADD_CHILDNODE" => array("path", "childTitle"),
-        "REMOVE_NODE" => array("path"),
-        "MOVE_NODE" => array("from", "to"),
-        "EDIT_NODE" => array("path", "newTitle"),
-    );
-
-    $repository = getRepository($repositoryTitle);
-    foreach($commands as $command) {
-        $words = preg_split("/[\s,]+/", $command);
-        if(array_key_exists(0, $words) && array_key_exists($words[0], $map)) {
-            $commandName = array_shift($words);
-            $argNames = $map[commandName];
-            $args = array();
-            for($i = 0; $i < count($argNames); ++$i) {
-                $args[$argNames[$i]] = $words[$i];
-            }
-            if(arrayHasNull($args)) {
-                HTTPResponse(400);
-                echo "$command";
-                exit(1);
-            }
-            applyCommand($repository, $command, $args);
-        }
-        else {
-            HTTPResponse(501);
-            echo "$command";
-            exit(1);
-        }
-    }
-    setRepository($repositoryTitle, $repository);
-}
-
-function applyCommand($repository, $command, $args) {
-/*    switch($command) {
-    case "ADD_CHILDNODE":
-        
-        "REMOVE_NODE"
-        "MOVE_NODE"
-        "EDIT_NODE"
-        } */
-}
-
-function arrayHasNull($array) {
-    foreach($array as $item) {
-        if($item === null) {
-            return true;
-        }
-    }
-    return false;
-}
-
-$getList = function() {
-    $content = RepositoryList::getInJson();
-    echo $content;
-};
-$getRepository = function() {
-    $title = $_POST["title"];
-    $content = Repository::getInJson($title);
-    echo $content;
-};
-$getArticle = function() {
-    $repositoryTitle = $_POST["title"];
-    $file = $_POST["file"];
-    echo Repository::getArticle($title, $file);
-};
-$createRepository = function() {
-    $title = $_POST["title"];
-    RepositoryList::createRepository($title);
-};
-$deleteRepostory = function() {
-    $title = $_POST["title"];
-    RepositoryList::deleteRepository($title);
-};
-$editRepository = function() {
-    $title = $_POST["title"];
-    $repository = new Repository($title);
-    $commands = explode("\n", $_POST["command"]);
-    foreach($commands as $command) {
-        if(preg_match('/^[\s]*$/', $command)) {
-            continue;
-        }
-        $words = preg_split("/[\s]+/", $command);
-        switch($words[0]) {
-        case "NEW_NODE":
-            $repository->newChildNode($words[1], $words[2]);
-            break;
-        case "REMOVE_NODE":
-            $repository->removeNode($words[1]);
-        }
-    }
-    $repository->save();
-};
-$editArticle = function() {
-    $repositoryTitle = $_POST["title"];
-    $file = $_POST["file"];
-    $content = $_POST["content"];
-    Repository::putArticle($title, $file, $content);
-};
