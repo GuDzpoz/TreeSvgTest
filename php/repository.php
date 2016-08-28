@@ -16,14 +16,14 @@
 require_once ("config.php");
 require_once ("util.php");
 
-define ( "LIST_NAME", "list" );
-define ( "LIST_PATH", joinPaths ( constant ( "DATA_DIRECTORY" ), constant ( "LIST_NAME" ) ) );
-define ( "NODE_SEPARATOR", "/" );
+define("LIST_NAME", "list");
+define("LIST_PATH", joinPaths(constant("DATA_DIRECTORY"), constant("LIST_NAME")));
+define("NODE_SEPARATOR", "/");
 function getPath($path, $isDir) {
-	return joinPaths ( constant ( "DATA_DIRECTORY" ), $path, $isDir );
+	return joinPaths(constant("DATA_DIRECTORY"), $path, $isDir);
 }
 function hashForName($string) {
-	return hash ( constant ( "HASH_FUNCTION" ), $string );
+	return hash(constant("HASH_FUNCTION"), $string);
 }
 class RepositoryList {
 	public static function getInJson() {
@@ -105,28 +105,41 @@ class RepositoryList {
 }
 class Repository {
 	private $repository;
-    public static function getJson($title) {
+    public static function getInJson($title) {
         $list = RepositoryList::get();
-        $path = getItemFromBy($list, "title", $title);
-        $content = file_get_contents($path);
+        $repository = getItemFromBy($list, "title", $title);
+        $content = file_get_contents($repository->file);
 		if ($content === false) {
 			error_process ( "" );
 		}
         return $content;
     }
-	public function __construct($title) {
-		$content = file_get_contents ( $path );
-		if ($content === false) {
+    public static function getArticle($title, $file) {
+        $list = RepositoryList::get();
+        $repository = getItemFromBy($list, "title", $title);
+        $path = joinPaths(getPath($repository->dir), $file);
+        $content = file_get_contents($path);
+        if ($content === false) {
 			error_process ( "" );
 		}
+        return $content;
+    }
+    public static function putArticle($title, $file, $content) {
+        $list = RepositoryList::get();
+        $repository = getItemFromBy($list, "title", $title);
+        $path = joinPaths(getPath($repository->dir), $file);
+        return file_put_contents($path, $content);
+    }
+	public function __construct($title) {
+		$content = self::getInJson($path);
 		$this->repository = json_decode ( $content );
 	}
 	public function save() {
 		$content = json_encode ( $repository );
 		file_put_contents ( $repository->file, $content );
 	}
-	public function newChildNode($repository, $path, $title) {
-		$parent = $this->getNode ( $repository, $path );
+	public function newChildNode($path, $title) {
+		$parent = $this->getNode($path);
 		if ($parent == null) {
 			HTTPResponse ( 400 );
 			echo "Path Not Exists.";
@@ -141,6 +154,25 @@ class Repository {
 		touch ( getPath ( joinPaths ( $repository->dir, $newNode->file ) ) );
 		array_push ( $parent->children, $newNode );
 	}
+    function removeNode($path) {
+        $node = $this->getNode($path);
+        if(!empty($node->children)) {
+            return false;
+        }
+        $parent = $this->getNode($path, -1);
+        getItemFromBy($parent->children, "id", $node->id, function($item, &$array, $i) {
+            unset($array[$i]);
+        });
+    }
+    function moveNode($fromPath, $newParentPath) {
+        $currentParent = $this->getNode($fromPath, -1);
+        $node = $this->getNode($fromPath);
+        $newParent = $this->getNode($newParentPath);
+        array_push($newParent->children, $node);
+        getItemFromBy($currentParent->children, "id", $node->id, function($item, &$array, $i) {
+            unset($array[$i]);
+        });
+    }
 	private function titleExists($array, $title) {
 		$result = getItemFromBy ( $array, "title", $title );
 		if ($result === null) {
@@ -158,22 +190,18 @@ class Repository {
 	private function getNode($path, $level = 0) {
 		$parents;
 		if ($level) {
-			$parents = explode ( constant ( "NODE_SEPARATOR" ), $path, $level );
+			$parents = explode(constant("NODE_SEPARATOR"), $path, $level);
 		} else {
-			$parents = explode ( constant ( "NODE_SEPARATOR" ), $path );
+			$parents = explode(constant("NODE_SEPARATOR"), $path);
 		}
 		$parent = $this->repository;
-		foreach ( $parents as $parentName ) {
+		foreach($parents as $parentName) {
 			if ($parentName == "") {
 				continue;
 			} else {
-				$parent = getItemFromBy ( $parent->children, "id", $parentName );
+				$parent = getItemFromBy($parent->children, "id", $parentName);
 			}
 		}
 		return $parent;
 	}
 }
-function removeNode($repository, $path) {
-	$node = getNode ();
-}
-
