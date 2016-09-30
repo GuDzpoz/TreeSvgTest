@@ -33,9 +33,13 @@ define(["ajax"], function(ajax) {
     var get = function() {
 	return json;
     };
+    var getTitle = function() {
+	return json.title;
+    };
 
     return {
 	load: load,
+	getTitle: getTitle,
 	get: get,
     };
 });

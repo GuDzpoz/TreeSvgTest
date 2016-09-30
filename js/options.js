@@ -13,9 +13,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define(["ajax"], function(ajax) {
+define(["ajax", "data"], function(ajax, data) {
     var commands = [];
-    var title = null;
     var getPath = function(data) {
 	function pathIter(d) {
 	    if(d.parent == null) {
@@ -27,22 +26,15 @@ define(["ajax"], function(ajax) {
 	}
 	return pathIter(data);
     };
-    var getRoot = function(data) {
-	var d = data;
-	while(d.parent != null) {
-	    d = d.parent;
-	}
-	return d;
+    var getEdit = function(d) {
+	return "edit.html?" + "repo=" + encodeURIComponent(data.getTitle()) + "&file=" + encodeURIComponent(d.data.file);
     };
-    var getEdit = function(data) {
-	return "edit.html?" + "repo=" + encodeURIComponent(getRoot(data).data.title) + "&file=" + encodeURIComponent(data.data.file);
+    var getView = function(d) {
+	return "view.html?" + "repo=" + encodeURIComponent(data.getTitle()) + "&file=" + encodeURIComponent(d.data.file);
     };
-    var getView = function(data) {
-	return "view.html?" + "repo=" + encodeURIComponent(getRoot(data).data.title) + "&file=" + encodeURIComponent(data.data.file);
-    };
-    var newChildNode = function(data) {
-        var path = getPath(data);
-        var repoTitle = getRoot(data).data.title;
+    var newChildNode = function(d) {
+        var path = getPath(d);
+        var repoTitle = data.getTitle;
         return function() {
             var title = prompt("Please enter the title of The new node:");
             if(title == null || title == "") {
@@ -52,22 +44,22 @@ define(["ajax"], function(ajax) {
             commands.push("NEW_NODE " + path + " " + title);
         };
     };
-    var options = function(data) {
+    var options = function(d) {
 	var options = {
 	    "Get The Path Of The Node": {
-		text: getPath(data),
+		text: getPath(d),
 	    },
 	    "View The Content Of The Node": {
-		link: getView(data),
+		link: getView(d),
 	    },
 	};
         if(ajax.isLoginned()) {
             Object.assign(options, {
                 "Edit Node Content": {
-                    link: getEdit(data),
+                    link: getEdit(d),
                 },
                 "New Child Node": {
-                    callback: newChildNode(data),
+                    callback: newChildNode(d),
                 }, /* not yet
                 "Move Node": {
                     callback: moveNode(data),
@@ -80,11 +72,12 @@ define(["ajax"], function(ajax) {
         return options;
     };
     var save = function(callback) {
-        if(title == null) {
+        if(command.length == 0) {
             alert("Nothing to save.");
             return;
         }
-        ajax.send(ajax.requests.EDIT_REPOSITORY, { "title": title, "command": commands.join("\n") }, callback);
+        ajax.send(ajax.requests.EDIT_REPOSITORY, { "title": data.getTitle(), "command": commands.join("\n") }, callback);
+	command = [];
     };
     if(ajax.isLoginned()) {
         return {

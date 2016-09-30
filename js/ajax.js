@@ -128,6 +128,22 @@ define(function() {
 	    return false;
 	}
     };
+    function getArgs() {
+        var search = location.search.substring(1);
+        var args = search.split("&");
+        var result = {};
+        for(i in args) {
+            var pair = args[i].split("=");
+            if(pair[1] == undefined) {
+                pair[1] = "";
+            }
+            else {
+                pair[1] = decodeURIComponent(pair[1]);
+            }
+            result[pair[0]] = pair[1];
+        }
+        return result;
+    }
     
     return {
 	get: get,
@@ -137,5 +153,6 @@ define(function() {
 	send: send,
 	isLoginned: isLoginned,
 	simpleAlert: simpleAlert,
+	getArgs: getArgs,
     };
 });

@@ -121,7 +121,8 @@ class Repository {
         $path = joinPaths(getPath($repository->dir), $file);
         $content = file_get_contents($path);
         if ($content === false) {
-			errorProcess (400, "File '$file' may not exist.");
+			// errorProcess (400, "File '$file' may not exist.");
+            return "";
 		}
         return $content;
     }

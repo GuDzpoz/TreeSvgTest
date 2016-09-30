@@ -17,31 +17,10 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <title>TEST</title>
     <link rel="stylesheet" type="text/css" href="browse.css" />
+    <script type="text/javascript" src="js/require-config.js"></script>
   </head>
   <body>
     <svg id="svg"></svg>
-    <script type="text/javascript" data-main="js/browse" src="js/lib/require.js"></script>
-    <script>
-      require.config({
-        baseUrl: "js/",
-        paths: {
-          "d3": "lib/d3",
-          "hammer": "lib/hammer",
-          "require": "lib/require",
-          "showdown": "lib/showdown",
-        },
-        shim: {
-          "d3": {
-            exports: "d3",
-          },
-          "hammer": {
-            exports: "Hammer",
-          },
-          "showdown": {
-            exports: "showdown",
-          },
-        },
-      });
-    </script>
+    <script type="text/javascript" data-main="browse" src="js/lib/require.js"></script>
   </body>
 </html>

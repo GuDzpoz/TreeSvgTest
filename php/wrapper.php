@@ -14,6 +14,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+require_once("repository.php");
+
 $getList = function() {
     $content = RepositoryList::getInJson();
     echo $content;
@@ -26,7 +28,7 @@ $getRepository = function() {
 $getArticle = function() {
     $repositoryTitle = $_POST["title"];
     $file = $_POST["file"];
-    echo Repository::getArticle($title, $file);
+    echo Repository::getArticle($repositoryTitle, $file);
 };
 $createRepository = function() {
     $title = $_POST["title"];
@@ -64,5 +66,5 @@ $editArticle = function() {
     $repositoryTitle = $_POST["title"];
     $file = $_POST["file"];
     $content = $_POST["content"];
-    Repository::putArticle($title, $file, $content);
+    Repository::putArticle($repositoryTitle, $file, $content);
 };

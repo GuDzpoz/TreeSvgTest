@@ -16,42 +16,42 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <title>Select File</title>
+    <script type="text/javascript" src="js/require-config.js"></script>
     <style>
+      table {
+      width: 100%;
+      height: 100%;
+      }
+      .main {
+      width: 100%;
+      height: 100%;
+      }
+      .main>td:nth-child(1) {
+      width: 49%;
+      height: 100%;
+      }
+      .main>td:nth-child(2) {
+      width: 50%;
+      height: 100%;
+      }
+      pre {
+      width: 100%;
+      height: 100%;
+      }
+      #content {
+      width: 100%;
+      height: 100%;
+      }
     </style>
   </head>
   <body>
     <table>
       <tr><td><button id="submit">Submit</button></td></tr>
-      <tr>
+      <tr class="main">
         <td><textarea id="source"></textarea></td>
         <td><div id="content"></div></td>
       </tr>
     </table>
-    <script type="text/javascript" data-main="js/edit" src="js/lib/require.js"></script>
-    <script>
-      require.config({
-        baseUrl: "js/",
-        paths: {
-          "d3": "lib/d3",
-          "hammer": "lib/hammer",
-          "require": "lib/require",
-          "showdown": "lib/showdown",
-          "ace": "lib/ace",
-        },
-        shim: {
-          "d3": {
-            exports: "d3",
-          },
-          "hammer": {
-            exports: "Hammer",
-          },
-          "showdown": {
-            exports: "showdown",
-          },
-          "ace": {
-            exports: "ace",
-          },
-        });
-    </script>
+    <script type="text/javascript" data-main="edit" src="js/lib/require.js"></script>
   </body>
 </html>

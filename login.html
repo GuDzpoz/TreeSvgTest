@@ -12,13 +12,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
+
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <title>Login</title>
+    <script type="text/javascript" src="js/require-config.js"></script>
   </head>
   <body>
-    <form action="php/login.php" method="post">
+    <form action="php/login.php" method="post" id="login">
       <table>
 	<tr>
 	  <td><label for="name">User Name</label></td>
@@ -31,5 +33,6 @@
       </table>
       <input type="submit" />
     </form>
+    <script data-main="login" src="js/lib/require.js"></script>
   </body>
 </html>

@@ -1,4 +1,4 @@
-<!--
+/*
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -11,15 +11,19 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
--->
-<html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <title>Viewer</title>
-    <script type="text/javascript" src="js/require-config.js"></script>
-  </head>
-  <body>
-    <div id="content"></div>
-    <script type="text/javascript" data-main="view" src="js/lib/require.js"></script>
-  </body>
-</html>
+*/
+
+define(["crypto-sha512"], function(CryptoJS) {
+    var form = document.getElementById("login");
+    form.onsubmit = function() {
+	var input = document.getElementById("password");
+	var password = input.value;
+	var salt = password.replace(/\D/g, "");
+	for(var i = 0; i != 100; ++i) {
+	    var oldSalt = salt;
+	    salt = password.replace(/\d/g, "");
+	    password = CryptoJS.SHA512(password + oldSalt).toString();
+	}
+	input.value = password;
+    };
+});
