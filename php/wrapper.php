@@ -39,6 +39,7 @@ $deleteRepostory = function() {
     RepositoryList::deleteRepository($title);
 };
 $editRepository = function() {
+    error_log("RUN");
     $title = $_POST["title"];
     $repository = new Repository($title);
     $commands = explode("\n", $_POST["command"]);

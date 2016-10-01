@@ -39,7 +39,7 @@ $requests = array(
     "CREATE_REPOSITORY" => array($createRepository, true),
     "DELETE_REPOSITORY" => array($deleteRepostory, true),
     /* "RENAME_REPOSITORY" => ..., not implemented */
-    "EDIT_REPOSTORY" => array($editRepository, true), // to add, move and remove nodes, but edit(rename) nodes not implemented
+    "EDIT_REPOSITORY" => array($editRepository, true), // to add, move and remove nodes, but edit(rename) nodes not implemented
     "EDIT_ARTICLE" => array($editArticle, true),
 );
 
@@ -57,3 +57,4 @@ else {
     HTTPResponse(400);
     exit(1);
 }
+

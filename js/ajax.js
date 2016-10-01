@@ -75,7 +75,7 @@ define(function() {
     var post = {
 	"CREATE_REPOSITORY": "CREATE_REPOSITORY",
 	"DELETE_REPOSITORY": "DELETE_REPOSITORY",
-	"EDIT_REPOSTORY": "EDIT_REPOSTORY",
+	"EDIT_REPOSITORY": "EDIT_REPOSITORY",
 	"EDIT_ARTICLE": "EDIT_ARTICLE",
     };
     var requests = Object.assign({}, get, post);

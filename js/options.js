@@ -72,12 +72,12 @@ define(["ajax", "data"], function(ajax, data) {
         return options;
     };
     var save = function(callback) {
-        if(command.length == 0) {
+        if(commands.length == 0) {
             alert("Nothing to save.");
             return;
         }
         ajax.send(ajax.requests.EDIT_REPOSITORY, { "title": data.getTitle(), "command": commands.join("\n") }, callback);
-	command = [];
+	commands = [];
     };
     if(ajax.isLoginned()) {
         return {

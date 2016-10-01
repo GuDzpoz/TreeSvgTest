@@ -30,7 +30,7 @@ function auth() {
 function login($name, $password) {
     $info = array(
         # MyRepository => MyRepository
-        "MyRepository" => "9627a53f19a6f0f82b160aa77a5e5f619fce0e04d88c8ea51f7093cf1d717eb5bcaaef4eb6e14e074878a202d90d64e1683254ab26ffd2c9774f6843b7201639",
+        "MyRepository" => "358673b6c95806b2bf116b080f101c6564153b5b8441c546f8b7563fc3ac5875b538d9018735e3ee2e307be5bf59b976e4606deb05d2b1beb9de0e05e9d49193",
     );
     
     if($info[$name] == securityHash($password)) {

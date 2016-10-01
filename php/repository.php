@@ -135,27 +135,27 @@ class Repository {
         return file_put_contents($path, $content);
     }
 	public function __construct($title) {
-		$content = self::getInJson($path);
+		$content = self::getInJson($title);
 		$this->repository = json_decode ( $content );
 	}
 	public function save() {
-		$content = json_encode ( $repository );
-		file_put_contents ( $repository->file, $content );
+		$content = json_encode($this->repository);
+		file_put_contents($this->repository->file, $content );
 	}
 	public function newChildNode($path, $title) {
 		$parent = $this->getNode($path);
 		if ($parent == null) {
-			HTTPResponse ( 400 );
+			HTTPResponse(400);
 			echo "Path Not Exists.";
 			exit ( 1 );
 		}
-		if (titleExists ( $parent->children, $title )) {
+		if ($this->titleExists($parent->children, $title)) {
 			HTTPResponse ( 400 );
 			echo "Title Already Exists.";
 			exit ( 1 );
 		}
-		$newNode = initNode ( $title );
-		touch ( getPath ( joinPaths ( $repository->dir, $newNode->file ) ) );
+		$newNode = $this->initNode($title);
+		touch(getPath(joinPaths($this->repository->dir, $newNode->file)));
 		array_push ( $parent->children, $newNode );
 	}
     function removeNode($path) {

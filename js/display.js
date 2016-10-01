@@ -47,6 +47,27 @@ define(["options", "gesture", "d3"], function(options, gesture, d3) {
 	    d3Element.attr("transform", transformString);
 	}
     }
+    var getSize = function(hierarchy) {
+        var box = [];
+        function iter(node, index) {
+            if(box[index] == undefined) {
+                box.push(0);
+            }
+            if(node.children == undefined) {
+                box[index] += 1;
+            }
+            else {
+                box[index] += Math.max(node.children.length, 1);
+                for(i in node.children) {
+                    iter(node.children[i], index + 1);
+                }
+            }
+        }
+        iter(hierarchy, 0);
+        var width = box.length;
+        var height = Math.max.apply(null, box);
+        return [width, height];
+    };
     var display = function(json, svgSelector) {
         if(options.save) {
             d3.select("body").append("button").text("Save").on("click", function() {
@@ -56,9 +77,10 @@ define(["options", "gesture", "d3"], function(options, gesture, d3) {
 	svg = d3.select(svgSelector);
 	
 	root = d3.hierarchy(json);
-	width = window.innerWidth;
-	height = window.innerHeight;
-	d3.tree().size([height/2, width/2])(root);
+        var size = getSize(root);
+	width = size[0];
+	height = size[1];
+	d3.tree().size([height * 25, width * 125])(root);
 
 	g = svg.append("g");
 	transform(g, "translate", [0, 0]);
