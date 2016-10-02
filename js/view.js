@@ -16,9 +16,9 @@
 define(["ajax", "showdown"], function(ajax, showdown) {
     var args = ajax.getArgs();
     console.log(args);
-    var title = args["repo"];
-    var file = args["file"];
-    ajax.send(ajax.requests.GET_ARTICLE, { "title": title, "file": file }, function(error, xmlhttp) {
+    var title = args["title"];
+    var id = args["id"];
+    ajax.send(ajax.requests.GET_ARTICLE, { "title": title, "id": id }, function(error, xmlhttp) {
         if(error) {
             ajax.simpleAlert(xmlhttp);
         }

@@ -27,8 +27,8 @@ $getRepository = function() {
 };
 $getArticle = function() {
     $repositoryTitle = $_POST["title"];
-    $file = $_POST["file"];
-    echo Repository::getArticle($repositoryTitle, $file);
+    $id = $_POST["id"];
+    echo Repository::getArticle($repositoryTitle, $id);
 };
 $createRepository = function() {
     $title = $_POST["title"];
@@ -65,7 +65,7 @@ $editRepository = function() {
 };
 $editArticle = function() {
     $repositoryTitle = $_POST["title"];
-    $file = $_POST["file"];
+    $id = $_POST["id"];
     $content = $_POST["content"];
-    Repository::putArticle($repositoryTitle, $file, $content);
+    Repository::putArticle($repositoryTitle, $id, $content);
 };

@@ -43,7 +43,7 @@ var require = {
         },
         "crypto-sha512": {
             deps: ["crypto", "crypto-sha512-rollups"],
-            exports: "CryptoJS",
+            exports: "CryptoJS.SHA512",
         },
     }
 };

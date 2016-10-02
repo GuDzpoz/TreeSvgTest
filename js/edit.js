@@ -15,9 +15,9 @@
 
 define(["ajax", "showdown", "ace/ace"], function(ajax, showdown, ace) {
     var args = ajax.getArgs();
-    var title = args["repo"];
-    var file = args["file"];
-    ajax.send(ajax.requests.GET_ARTICLE, { "title": title, "file": file }, function(error, xmlhttp) {
+    var title = args["title"];
+    var id = args["id"];
+    ajax.send(ajax.requests.GET_ARTICLE, { "title": title, "id": id }, function(error, xmlhttp) {
         if(error) {
             ajax.simpleAlert(xmlhttp);
         }
@@ -37,7 +37,7 @@ define(["ajax", "showdown", "ace/ace"], function(ajax, showdown, ace) {
 
         var button = document.getElementById("submit");
         button.onclick = function() {
-            ajax.send(ajax.requests.GET_ARTICLE, { "title": title, "file": file, "content": editor.getValue() }, function(error, xmlhttp) {
+            ajax.send(ajax.requests.EDIT_ARTICLE, { "title": title, "id": id, "content": editor.getValue() }, function(error, xmlhttp) {
                 if(error) {
                     ajax.simpleAlert(xmlhttp, function() {});
                 }

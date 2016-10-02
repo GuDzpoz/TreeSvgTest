@@ -19,6 +19,12 @@ require_once ("util.php");
 define("LIST_NAME", "list");
 define("LIST_PATH", joinPaths(constant("DATA_DIRECTORY"), constant("LIST_NAME")));
 define("NODE_SEPARATOR", "/");
+function getFileName($id) {
+    return $id;
+}
+function GetDirName($id) {
+    return $id . constant("REPOSITORY_APPEND");
+}
 function getPath($path, $isDir = false) {
 	return joinPaths(constant("DATA_DIRECTORY"), $path, $isDir);
 }
@@ -79,32 +85,30 @@ class RepositoryList {
 		self::set($list);
 		
 		$repository = self::initRepository($newItem);
-		mkdir ( getPath ( $repository->dir ) );
-		file_put_contents(getPath($repository->file), json_encode($repository));
+		mkdir(getPath(getDirName($repository->id)));
+		file_put_contents(getPath(getFileName($repository->id)), json_encode($repository));
 		return true;
 	}
 	public static function deleteRepository($title) {
-		$list = self::get ();
+		$list = self::get();
 		getItemFromBy($list, "title", $title, function ($item, &$array, $i) {
-			unlink ( getPath ( $item->file ) );
-			delTree ( getPath ( $item->dir ) );
-			unset ( $array [$i] );
+			unlink(getPath(getFileName($item->id)));
+			delTree(getPath(getDirName($item->id)));
+			unset($array[$i]);
 		} );
-		RepositoryList::set ( $list );
+		RepositoryList::set($list);
 	}
 	private static function newRepository($title) {
 		$listItem = new stdClass();
-		$path = hashForName($title);
+		$id = hashForName($title);
 		$listItem->title = $title;
-		$listItem->file = $path;
-		$listItem->dir = $path . constant("REPOSITORY_APPEND");
+		$listItem->id = $id;
 		return $listItem;
 	}
 	private static function initRepository($repository) {
 		$root = new stdClass ();
-		$root->file = $repository->file;
+        $root->id = $repository->id;
 		$root->title = $repository->title;
-		$root->dir = $repository->dir;
 		$root->children = array ();
 		return $root;
 	}
@@ -113,24 +117,24 @@ class Repository {
 	private $repository;
     public static function getInJson($title) {
         $repository = RepositoryList::getRepository($title);
-        $content = file_get_contents(getPath($repository->file));
+        $content = file_get_contents(getPath(getFileName($repository->id)));
         return $content;
     }
-    public static function getArticle($title, $file) {
+    public static function getArticle($title, $id) {
         $repository = RepositoryList::getRepository($title);
-        $path = joinPaths(getPath($repository->dir), $file);
+        $path = joinPaths(getPath(getDirName($repository->id)), getFileName($id));
         $content = file_get_contents($path);
         if ($content === false) {
-			// errorProcess (400, "File '$file' may not exist.");
+			// errorProcess (400, "File with id '$id' may not exist.");
             return "";
 		}
         return $content;
     }
-    public static function putArticle($title, $file, $content) {
+    public static function putArticle($title, $id, $content) {
         $repository = RepositoryList::getRepository($title);
-        $path = joinPaths(getPath($repository->dir), $file);
+        $path = joinPaths(getPath(getDirName($repository->id)), getFileName($id));
         if ($content === false) {
-			errorProcess (400, "File '$file' may not exist.");
+			errorProcess (400, "File with id '$id' may not exist.");
 		}
         return file_put_contents($path, $content);
     }
@@ -140,7 +144,7 @@ class Repository {
 	}
 	public function save() {
 		$content = json_encode($this->repository);
-		file_put_contents($this->repository->file, $content );
+		file_put_contents(getPath(getFileName($this->repository->id)), $content);
 	}
 	public function newChildNode($path, $title) {
 		$parent = $this->getNode($path);
@@ -155,7 +159,7 @@ class Repository {
 			exit ( 1 );
 		}
 		$newNode = $this->initNode($title);
-		touch(getPath(joinPaths($this->repository->dir, $newNode->file)));
+		touch(getPath(joinPaths(getDirName($this->repository->id), getFileName($newNode->id))));
 		array_push ( $parent->children, $newNode );
 	}
     function removeNode($path) {
@@ -185,11 +189,11 @@ class Repository {
 		return true;
 	}
 	private function initNode($title) {
-		$node = new stdClass ();
+		$node = new stdClass();
 		$node->title = $title;
-		$node->id = hashForName ( $title );
-		$node->file = $node->id;
-		$node->children = array ();
+		$node->id = hashForName($title);
+		$node->children = array();
+        return $node;
 	}
 	private function getNode($path, $level = 0) {
 		$parents;

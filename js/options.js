@@ -27,10 +27,10 @@ define(["ajax", "data"], function(ajax, data) {
 	return pathIter(data);
     };
     var getEdit = function(d) {
-	return "edit.html?" + "repo=" + encodeURIComponent(data.getTitle()) + "&file=" + encodeURIComponent(d.data.file);
+	return "edit.html?" + "title=" + encodeURIComponent(data.getTitle()) + "&id=" + encodeURIComponent(d.data.id);
     };
     var getView = function(d) {
-	return "view.html?" + "repo=" + encodeURIComponent(data.getTitle()) + "&file=" + encodeURIComponent(d.data.file);
+	return "view.html?" + "title=" + encodeURIComponent(data.getTitle()) + "&id=" + encodeURIComponent(d.data.id);
     };
     var newChildNode = function(d) {
         var path = getPath(d);
