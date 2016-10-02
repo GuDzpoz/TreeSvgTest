@@ -13,7 +13,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define(["ajax", "data"], function(ajax, data) {
+define(["crypto-md5", "ajax", "data"], function(CryptoJS, ajax, data) {
     var commands = [];
     var getPath = function(data) {
 	function pathIter(d) {
@@ -34,7 +34,6 @@ define(["ajax", "data"], function(ajax, data) {
     };
     var newChildNode = function(d) {
         var path = getPath(d);
-        var repoTitle = data.getTitle;
         return function() {
             var title = prompt("Please enter the title of The new node:");
             if(title == null || title == "") {
@@ -42,6 +41,35 @@ define(["ajax", "data"], function(ajax, data) {
                 return;
             }
             commands.push("NEW_NODE " + path + " " + title);
+            var newNode = {};
+            newNode.children = [];
+            newNode.title = title;
+            newNode.id = CryptoJS.MD5(title).toString();
+            d.data.children.push(newNode);
+            return data.get();
+        };
+    };
+    var getItemFromBy = function(array, key, value, callback) {
+        for(index in array) {
+            if(array[index][key] == value) {
+                if(callback) {
+                    callback(array[index], array, index);
+                }
+                return array[index];
+            }
+        }
+        return null;
+    };
+    var removeNode = function(d) {
+        var path = getPath(d);
+        return function() {
+            if(confirm("Are you going to remove this node?")) {
+                commands.push("REMOVE_NODE " + path);
+            }
+            getItemFromBy(d.parent.data.children, "id", d.data.id, function(d, array, index) {
+                array.splice(index, 1);
+            });
+            return data.get();
         };
     };
     var options = function(d) {
@@ -60,13 +88,15 @@ define(["ajax", "data"], function(ajax, data) {
                 },
                 "New Child Node": {
                     callback: newChildNode(d),
+                    update: true,
                 }, /* not yet
                 "Move Node": {
-                    callback: moveNode(data),
-                },
-                "Remove Node": {
-                    callback: removeNode(data),
+                    callback: moveNode(d),
                 }, */
+                "Remove Node": {
+                    callback: removeNode(d),
+                    update: true,
+                },
             });
         }
         return options;

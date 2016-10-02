@@ -24,6 +24,8 @@ var require = {
 	"crypto": "lib/crypto/components/core",
 	"crypto-sha512": "lib/crypto/components/sha512",
 	"crypto-sha512-rollups": "lib/crypto/rollups/sha512",
+	"crypto-md5": "lib/crypto/components/md5",
+	"crypto-md5-rollups": "lib/crypto/rollups/md5",
     },
     shim: {
         "d3": {
@@ -43,7 +45,11 @@ var require = {
         },
         "crypto-sha512": {
             deps: ["crypto", "crypto-sha512-rollups"],
-            exports: "CryptoJS.SHA512",
+            exports: "CryptoJS",
+        },
+        "crypto-md5": {
+            deps: ["crypto", "crypto-md5-rollups"],
+            exports: "CryptoJS",
         },
     }
 };

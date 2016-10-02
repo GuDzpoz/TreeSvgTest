@@ -48,6 +48,7 @@ define(["options", "gesture", "d3"], function(options, gesture, d3) {
 	}
     }
     var getSize = function(hierarchy) {
+        var widths = [];
         var box = [];
         function iter(node, index) {
             if(box[index] == undefined) {
@@ -62,42 +63,44 @@ define(["options", "gesture", "d3"], function(options, gesture, d3) {
                     iter(node.children[i], index + 1);
                 }
             }
+
+            if(widths[index] == undefined) {
+                widths[index] = 0;
+            }
+            var width = node.data.title.length;
+            if(width > widths[index]) {
+                widths[index] = width;
+            }
         }
         iter(hierarchy, 0);
-        var width = box.length;
+        var width = Math.max.apply(null, widths) * widths.length;
         var height = Math.max.apply(null, box);
         return [width, height];
     };
-    var display = function(json, svgSelector) {
-        if(options.save) {
-            d3.select("body").append("button").text("Save").on("click", function() {
-                options.save();
-            });
-        }
-	svg = d3.select(svgSelector);
-	
+    var diagonal = function(d) {
+        return "M" + d.y + "," + d.x
+            + "C" + (d.parent.y + 100) + "," + d.x
+            + " " + (d.parent.y + 100) + "," + d.parent.x
+            + " " + d.parent.y + "," + d.parent.x;
+    }
+    var update = function(json) {
+        var t = d3.transition().duration(750);
 	root = d3.hierarchy(json);
         var size = getSize(root);
 	width = size[0];
 	height = size[1];
-	d3.tree().size([height * 25, width * 125])(root);
-
-	g = svg.append("g");
-	transform(g, "translate", [0, 0]);
+	d3.tree().size([height * 25, width * 9])(root);
 	
-	var link = g.selectAll(".link")
-	    .data(root.descendants().slice(1))
-	    .enter().append("path")
+	var link = g.selectAll(".link").data(root.descendants().slice(1));
+        link.transition(t).attr("d", diagonal);
+	link.enter().append("path")
 	    .attr("class", "link")
-	    .attr("d", function(d) {
-		return "M" + d.y + "," + d.x
-		    + "C" + (d.parent.y + 100) + "," + d.x
-		    + " " + (d.parent.y + 100) + "," + d.parent.x
-		    + " " + d.parent.y + "," + d.parent.x;
-	    });
+	    .attr("d", diagonal);
+        link.exit().transition(t).remove();
 	
-	g.selectAll(".node").data(root.descendants())
-	    .enter().append("g")
+	var node = g.selectAll(".node").data(root.descendants());
+        node.transition(t).attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+        node.enter().append("g")
 	    .attr("class", function(d) {
 		if(d.children == null) {
 		    return "node";
@@ -107,8 +110,35 @@ define(["options", "gesture", "d3"], function(options, gesture, d3) {
 		}
 	    })
 	    .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+            .each(function(d) {
+	        gesture.onTap(d3.select(this), function(event, data) {
+	            showOptionBox.call(this, data);
+	            gesture.onTap(d3.select("#blocker"), function(event, data) {
+		        hideOptionBox.call(this);
+	            });
+	        });
+            })
 	    .append("text")
 	    .text(function(d) { return d.data.title; });
+        node.exit().transition(t).remove();
+    };
+    var display = function(json, svgSelector) {
+        if(options.save) {
+            d3.select("body").append("button").text("Save").on("click", function() {
+                options.save();
+            });
+        }
+	svg = d3.select(svgSelector);
+	g = svg.append("g");
+	transform(g, "translate", [0, 0]);
+	
+	root = d3.hierarchy(json);
+        var size = getSize(root);
+	width = size[0];
+	height = size[1];
+	d3.tree().size([height * 25, width * 10])(root);
+
+	update(json);
     };
     var processOptions = function(options) {
 	var elements = [];
@@ -122,9 +152,14 @@ define(["options", "gesture", "d3"], function(options, gesture, d3) {
 		});
 	    }
             if(response.callback) {
-		gesture.onTap(d3.select(a), function() {
-		    response.callback();
-		});
+		gesture.onTap(d3.select(a), function(d) {
+		    return function() {
+                        var result = d.callback();
+                        if(d.update) {
+                            update(result);
+                        }
+                    };
+		}(response));
             }
 	    if(response.link) {
 		a.setAttribute("href", response.link);

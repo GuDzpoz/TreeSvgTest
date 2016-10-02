@@ -13,16 +13,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define(["data", "display", "gesture", "utilization", "d3"], function(data, display, gesture, utilization, d3) {
+define(["d3", "data", "display", "utilization"], function(d3, data, display, utilization) {
     data.load(decodeURIComponent(window.location.search.substring(1)), function(json) {
 	display.display(json, "#svg");
 	utilization.mapDragging(d3.select(document), display.getGroup());
-	gesture.onTap(d3.selectAll(".node"), function(event, data) {
-	    display.showOptionBox.call(this, data);
-	    gesture.onTap(d3.select("#blocker"), function(event, data) {
-		display.hideOptionBox.call(this);
-	    });
-	});
     });
     
     return {};
