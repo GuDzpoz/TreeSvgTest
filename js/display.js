@@ -89,7 +89,7 @@ define(["options", "gesture", "d3"], function(options, gesture, d3) {
         var size = getSize(root);
 	width = size[0];
 	height = size[1];
-	d3.tree().size([height * 25, width * 9])(root);
+	d3.tree().size([height * 25, width * 10])(root);
 	
 	var link = g.selectAll(".link").data(root.descendants().slice(1));
         link.transition(t).attr("d", diagonal);
@@ -132,12 +132,6 @@ define(["options", "gesture", "d3"], function(options, gesture, d3) {
 	g = svg.append("g");
 	transform(g, "translate", [0, 0]);
 	
-	root = d3.hierarchy(json);
-        var size = getSize(root);
-	width = size[0];
-	height = size[1];
-	d3.tree().size([height * 25, width * 10])(root);
-
 	update(json);
     };
     var processOptions = function(options) {

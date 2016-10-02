@@ -147,10 +147,12 @@ class Repository {
 		file_put_contents(getPath(getFileName($this->repository->id)), $content);
 	}
 	public function newChildNode($path, $title) {
+        error_log($path);
+        error_log(var_export($this->repository, true));
 		$parent = $this->getNode($path);
 		if ($parent == null) {
 			HTTPResponse(400);
-			echo "Path Not Exists.";
+			echo "Path '$path' Not Exists.";
 			exit ( 1 );
 		}
 		if ($this->titleExists($parent->children, $title)) {
@@ -160,7 +162,7 @@ class Repository {
 		}
 		$newNode = $this->initNode($title);
 		touch(getPath(joinPaths(getDirName($this->repository->id), getFileName($newNode->id))));
-		array_push ( $parent->children, $newNode );
+		array_push($parent->children, $newNode);
 	}
     function removeNode($path) {
         $node = $this->getNode($path);
@@ -190,8 +192,8 @@ class Repository {
 	}
 	private function initNode($title) {
 		$node = new stdClass();
-		$node->title = $title;
-		$node->id = hashForName($title);
+		$node->title = preg_replace('/[\x00-\x1F]/', '', $title);
+		$node->id = hashForName($node->title);
 		$node->children = array();
         return $node;
 	}
